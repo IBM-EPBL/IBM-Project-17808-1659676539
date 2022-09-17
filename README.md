@@ -13,6 +13,6 @@ IBM Cloud,HTML,Javascript,IBM Cloud Object Storage,Python-Flask,Kubernetes,Docke
 ## 🧑🏻‍🦰 TEAM MEMBERS
 
 - Ganesh kumar
-- Adnan
+- Mohammed Adnan
 - Dinesh
 - Vignesh 
