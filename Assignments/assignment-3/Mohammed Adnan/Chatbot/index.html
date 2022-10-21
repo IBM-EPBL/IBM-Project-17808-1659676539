@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>
+            Expense Tracker
+        </title>
+        <link rel="icon" href="https://img.icons8.com/bubbles/50/000000/money.png"/>
+        <link rel="stylesheet" href="style.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <script>
+  window.watsonAssistantChatOptions = {
+    integrationID: "be5f7327-2ea6-4e90-8bc7-bc6b9fe524f5", // The ID of this integration.
+    region: "jp-tok", // The region your integration is hosted in.
+    serviceInstanceID: "92720a3b-4b12-4c0e-85b8-22abede429d7", // The ID of your service instance.
+    onLoad: function(instance) { instance.render(); }
+  };
+  setTimeout(function(){
+    const t=document.createElement('script');
+    t.src="https://web-chat.global.assistant.watson.appdomain.cloud/versions/" + (window.watsonAssistantChatOptions.clientVersion || 'latest') + "/WatsonAssistantChatEntry.js";
+    document.head.appendChild(t);
+  });
+</script>
+    </head>
+
+    <body>
+        <h1 id="maintitle">Expense Tracker</h1>
+        
+        <p>Add positive value for earnings.</p>
+        <p>Add negative value for expenses.</p>
+
+        <form>
+            <input type="text" id="desc" placeholder="Description..."/>
+            <input type="number" id="val" placeholder="Rs."/>
+            <input type="date" id="transdate"/>
+            <button id="formAddButton"><i class="fa fa-plus-circle fa-3x"></i></button>
+        </form>
+
+        <div id="tabs">
+            <div id="total">Total Left: &nbsp;Rs  &nbsp;<span id="total-amt">0</span></div>
+            <div id="earn">Total Earned:  &nbsp;Rs  &nbsp;<span id="earn-amt">0</span></div>
+            <div id="spend">Total Spent:  &nbsp;Rs  &nbsp;<span id="spend-amt">0</span></div>
+        </div>
+
+        <table id="transactions">
+            <tr>
+              <th style="width: 10%;"> </th>
+              <th style="width: 40%;">Description</th>
+              <th style="width: 30%">Amount</th>
+              <th style="width: 10%;">Date</th>
+            </tr>
+          </table>
+
+          <script src="script.js"></script>
+
+    </body>
+</html>
