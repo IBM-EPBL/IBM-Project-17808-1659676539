@@ -1,0 +1,359 @@
+{% extends "layout.html" %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+{% endblock %}
+
+{% block title %}
+Home
+{% endblock %}
+
+{% block main %}
+<h1>Dashboard</h1>
+
+<!-- Begin Quick Expense -->
+<button type="button" class="btn btn-outline-primary btn-block btn-lg" data-toggle="modal"
+    data-target="#quickExpenseModal">💰 Quick Expense 💰</button>
+
+<div class="modal fade" id="quickExpenseModal" tabindex="-1" role="dialog" aria-labelledby="quickExpenseModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="quickExpenseModalLabel">Add Expense</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="/" id="quickExpense" method="post" autocomplete="off">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <div class="form-group">
+                        <label for="description" class="col-form-label">Description:</label>
+                        <input type="text" class="form-control" name="description" id="description" value=""
+                            form="quickExpense" maxlength="200" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="category" class="col-form-label">Category:</label>
+                        <select id="category" class="form-control-sm" name="category" form="quickExpense" required>
+                            {% for category in categories %}
+                            <option value="{{ category['name'] }}">{{ category['name'] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="date" class="col-form-label">Date:</label>
+                        <input type="date" class="form-control" name="date" id="date" value="{{ date }}"
+                            form="quickExpense" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="payer" class="col-form-label">Payer:</label>
+                        <select id="payer" class="form-control-sm" name="payer" form="quickExpense" required>
+                            <option value="Self">Self</option>
+                            {% for payer in payers %}
+                            <option value="{{ payer['name'] }}">{{ payer['name'] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="amount" class="col-form-label">Amount:</label>
+                        <input type="text" class="form-control-sm" name="amount" id="amount" value="" size="10"
+                            placeholder="₹" required maxlength="10"
+                            pattern="(?=.*?\d)^(([1-9]\d{0,2}(\d{3})*)|\d+)?(\.\d{1,2})?$"
+                            title="Format must be currency value without dollar sign or commas e.g. 1, 2.50, 1500.75"
+                            form="quickExpense" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-success" form="quickExpense">Save Expense</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Quick Expense -->
+
+<br>
+<div class="container">
+    <!-- Begin Your Expenses -->
+    <div class="row">
+        <div class="col-12">
+            <h2 style="text-align:left">Your Expenses</h2>
+        </div>
+    </div>
+    {% if expenses_year %}
+    <div class="row">
+        <div class="col">
+            <div class="card text-white bg-success mb-3" style="max-width: 20rem;">
+                <div class="card-header"><strong>Remaining Income</strong></div>
+                <div class="card-body">
+                    {% set remainingIncome = (income - expenses_month) %}
+                    {% if remainingIncome < 0 %} <h4 class="card-title">₹0</h4>
+                        {% else %}
+                        <h4 class="card-title">{{ remainingIncome | usd }}</h4>
+                        {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card text-white bg-warning mb-3" style="max-width: 20rem;">
+                <div class="card-header"><strong>{{ date[:4] }} Expenses</strong></div>
+                <div class="card-body">
+                    {% if expenses_year != None %}
+                    <h4 class="card-title">{{ expenses_year | usd }}</h4>
+                    {% else %}
+                    <p>You have no expenses yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card text-white bg-primary mb-3" style="max-width: 20rem;">
+                <div class="card-header"><strong>Monthly Expenses</strong></div>
+                <div class="card-body">
+                    {% if expenses_month != None %}
+                    <h4 class="card-title">{{ expenses_month | usd }}</h4>
+                    {% else %}
+                    <p>You have no expenses yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card text-white bg-info mb-3" style="max-width: 20rem;">
+                <div class="card-header"><strong>Weekly Expenses</strong></div>
+                <div class="card-body">
+                    {% if expenses_week != None %}
+                    <h4 class="card-title">{{ expenses_week | usd }}</h4>
+                    {% else %}
+                    <p>You have no expenses yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <p style="text-align:left"><small class="text-muted">You have no expenses yet.</small></p>
+    {% endif %}
+    <!-- End Your Expenses -->
+
+    <!-- Begin Last 5 Expenses -->
+    <br>
+    <div class="row">
+        <div class="col-12">
+            <h4 style="text-align:left">Last 5 Expenses</h4>
+            {% if expenses_last5 != None %}
+            <p class="small" style="text-align:left"><a href="/expensehistory">(view all expense history)</a></p>
+            <div class="table-responsive">
+                <table class="table table-hover table-striped table-sm">
+                    <thead>
+                        <tr>
+                            <th scope="col">Description</th>
+                            <th scope="col">Category</th>
+                            <th scope="col">Date</th>
+                            <th scope="col">Payer</th>
+                            <th scope="col">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for expense in expenses_last5 %}
+                        <tr>
+                            <td>{{ expense['description'] }}</td>
+                            <td>{{ expense['category'] }}</td>
+                            <td>{{ expense['expensedate'] }}</td>
+                            <td>{{ expense['payer'] }}</td>
+                            <td>{{ expense['amount'] | usd }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p style="text-align:left"><small class="text-muted">You have no expenses yet.</small></p>
+            {% endif %}
+        </div>
+    </div>
+    <!-- End Last 5 Expenses -->
+
+    <!-- Begin Your Budgets -->
+    <br>
+    <div class="row">
+        <div class="col-12">
+            <h2 style="text-align:left">Your Budgets</h2>
+            {% if budgets %}
+            <p class="small" style="text-align:left"><a href="/budgets">(view all budgets)</a></p>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row">
+        {% if budgets %}
+        {% for budget in budgets %}
+        <div class="col">
+            <div class="card bg-light mb-3" style="max-width: 14rem;">
+                <div class="card-header"><strong><a href="/updatebudget/{{ budget['name'] }}">{{ budget["name"]
+                            }}</a></strong></div>
+                <div class="card-body-dash">
+                    {% set percent = ((budget["spent"] / budget["amount"]) * 100) %}
+                    {% set totalBudgetAmount = (budget["amount"] | usd) %}
+                    <p>You've spent {{ percent | round | int }}% of your {{ totalBudgetAmount }} budget</p>
+                    <div class="chart-container" style="position: relative; height:17vh">
+                        <canvas id="budgetChart.{{ loop.index - 1 }}"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="col">
+            <p style="text-align:left"><small class="text-muted">You have no budgets yet.</small></p>
+        </div>
+        {% endif %}
+    </div>
+    <!-- End Your Budgets -->
+
+    <!-- Begin Weekly Spending Chart -->
+    <br>
+    <div class="row">
+        <div class="col-12">
+            <h2 style="text-align:left">Weekly Spending</h2>
+        </div>
+    </div>
+    <div class="row">
+        {% if spending_week %}
+        <div class="col">
+            <div class="chart-container" style="position: relative; height:30vh">
+                <canvas id="weeklyChart"></canvas>
+            </div>
+        </div>
+        {% else %}
+        <div class="col">
+            <p style="text-align:left"><small class="text-muted">Chart will not display until you record at least 1
+                    expense.</small></p>
+        </div>
+        {% endif %}
+    </div>
+    <!-- End Weekly Spending Chart -->
+
+    <!-- Begin Monthly Spending Chart -->
+    <br>
+    <div class="row">
+        <div class="col-12">
+            <h2 style="text-align:left">Monthly Spending</h2>
+            {% if spending_month %}
+            <p class="small" style="text-align:left"><a href="/monthlyreport">(view full monthly report)</a></p>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row">
+        {% if spending_month %}
+        <div class="col">
+            <div class="chart-container" style="position: relative; height:30vh">
+                <canvas id="monthlyChart"></canvas>
+            </div>
+        </div>
+        {% else %}
+        <div class="col">
+            <p style="text-align:left"><small class="text-muted">Chart will not display until you record at least 1
+                    expense.</small></p>
+        </div>
+        {% endif %}
+    </div>
+    <!-- End Monthly Spending Chart -->
+
+    <!-- Begin Spending Habits Chart -->
+    <br>
+    <div class="row">
+        <div class="col-12">
+            <h2 style="text-align:left">Spending Habits</h2>
+            {% if spending_trends %}
+            <p class="small" style="text-align:left"><a href="/spendingreport">(view full spending report)</a></p>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row">
+        {% if spending_trends %}
+        <div class="col-12">
+            <div class="chart-container" style="position: relative; height:50vh">
+                <canvas id="spendingChart"></canvas>
+            </div>
+            <p><small class="text-muted">Chart note: does not include categories that represent less than 1% of overall
+                    spending</small></p>
+        </div>
+        {% else %}
+        <div class="col">
+            <p style="text-align:left"><small class="text-muted">Chart will not display until you record at least 1
+                    expense.</small></p>
+        </div>
+        {% endif %}
+    </div>
+    <!-- End Spending Habits Chart -->
+
+    <!-- Begin Payers Chart -->
+    <br>
+    <div class="row">
+        <div class="col-12">
+            <h2 style="text-align:left">Payer Spending</h2>
+            {% if payersChart %}
+            <p class="small" style="text-align:left"><a href="/payersreport">(view full payers report)</a></p>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row">
+        {% if payersChart %}
+        <div class="col-12">
+            <div class="chart-container" style="position: relative; height:40vh">
+                <canvas id="payersChart" width="400" height="400"></canvas>
+            </div>
+            <p><small class="text-muted">Chart note: does not include payers that represent less than 1% of overall
+                    spending</small></p>
+        </div>
+        {% else %}
+        <div class="col">
+            <p style="text-align:left"><small class="text-muted">Chart will not display until you record at least 1
+                    expense.</small></p>
+        </div>
+        {% endif %}
+    </div>
+    <!-- End payers Chart -->
+</div>
+
+
+<script src="/static/js/dashboard.js"></script>
+
+{% if budgets %}
+<script>
+    var budgetData = JSON.stringify({{ budgets | tojson }});
+    loadBudgetData(budgetData);
+</script>
+{% endif %}
+
+{% if spending_week %}
+<script>
+    var weeklyData = JSON.stringify({{ spending_week | tojson }});
+    loadWeeklySpendingData(weeklyData);
+</script>
+{% endif %}
+
+{% if spending_month %}
+<script>
+    var monthlyData = JSON.stringify({{ spending_month | tojson }});
+    loadMonthlySpendingData(monthlyData);
+</script>
+{% endif %}
+
+{% if spending_trends %}
+<script>
+    var trendsData = JSON.stringify({{ spending_trends | tojson }});
+    loadTrendsData(trendsData);
+</script>
+{% endif %}
+
+{% if payersChart %}
+<script>
+    var payersData = JSON.stringify({{ payersChart | tojson }});
+    loadPayersData(payersData);
+</script>
+{% endif %}
+
+{% endblock %}

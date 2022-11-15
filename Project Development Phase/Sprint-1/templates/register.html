@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Register
+{% endblock %}
+
+{% block main %}
+<h2>Tendie Tracker</h2>
+<small class="text-muted"><em>Every tender counts</em></small><br>
+<img class="mb-4" src="/static/logo.png" alt="Tendie Tracker logo" width="90" height="90">
+
+<br>
+<h1 class="h3 mb-3 font-weight-normal">Register an account</h1>
+{% if username %}
+<div class="alert alert-dismissible alert-danger">
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+    <h6 class="alert-heading">Oh snap!</h6>
+    The username '{{ username }}' is taken. Please try a new one.
+</div>
+{% endif %}
+<form action="/register" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    <div class="form-group">
+        <input autocomplete="off" autofocus class="form-control validate-register" name="username" id="username"
+            type="text" placeholder="Email" required pattern="^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$"
+            title="Enter a valid mail id">
+    </div>
+    <div class="form-group">
+        <input class="form-control validate-register" name="password" id="password" type="password" placeholder="Password" required
+            pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
+            title="Length must be at least 8 characters and contain minimum of one number, one lowercase letter, and one uppercase letter">
+        <small class="form-text text-muted">Your password is safe with us. We <strong>do not</strong> store plain-text
+            passwords in our database ❤</small>
+    </div>
+    <br>
+    <button class="btn btn-primary" id="btnRegister" type="submit">Register</button>
+</form>
+
+{# TODO 
+
+1) Password validation helper: https://www.w3schools.com/howto/howto_js_password_validation.asp
+2) Modern form validator with bootstrap: https://getbootstrap.com/docs/4.0/components/forms/#validation
+
+#}
+
+{% endblock %}
