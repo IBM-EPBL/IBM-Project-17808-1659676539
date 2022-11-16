@@ -1,0 +1,109 @@
+body {
+    margin: 0;
+    background-image: linear-gradient(
+        to right,
+        rgb(255, 137, 255),
+        rgb(100, 100, 255)
+    );
+    font-family: 'Roboto', sans-serif;
+}
+
+.index-home {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.index-bg {
+    height: 40vh;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: -1;
+}
+
+.index-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 4rem;
+}
+
+.index-title {
+    font-size: 3rem;
+    color: white;
+}
+
+.auth-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    padding: 2rem;
+    border-radius: 1.5rem;
+    box-shadow: 0 2px 15px 1px rgba(0, 0, 0, 0.25);
+}
+
+.auth-input {
+    /*margin: 1rem 0;*/
+    height: 4rem;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+input[type='text'],
+input[type='password'],
+select {
+    box-sizing: border-box;
+    padding: 0.9rem 0.5rem 0.9rem 0.5rem;
+    display: inline-block;
+    border: 2px solid #fffafa;
+    border-radius: 0.5rem;
+    background-color: #fffafa;
+    font-size: 1rem;
+    width: 17rem;
+}
+
+.btn-submit {
+    width: 100%;
+    align-self: center;
+    color: white;
+    background-color: #000000;
+    border: none;
+    margin: 1.3rem 0 1rem 0;
+    padding: 0.7rem;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.btn-submit:hover {
+    background-color: #000000;
+}
+
+.auth-shift-link {
+    color: #ffffe0;
+    font-weight: bolder;
+    cursor: pointer;
+}
+
+input:focus {
+    outline: none;
+    border: 2px solid #000000;
+}
+
+input:hover {
+    border: 2px solid #000000;
+}
+
+.auth-title {
+    font-size: 1.7rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
